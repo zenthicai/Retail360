@@ -110,11 +110,15 @@ def render_styled_table(df):
 with st.spinner("🔄 Loading face profiles..."):
     known_faces, labels = load_known_faces("known_faces")
 
+# Camera input for Streamlit Cloud compatibility
+image_data = st.camera_input("📸 Capture Your Face")
+
 # Button to initiate recognition
-if st.button("📸 Capture & Recognize Face"):
+if image_data is not None:
     with st.spinner("🧠 Matching with database..."):
-        live_face = capture_face_from_webcam()
-        matched_label = match_face(live_face, known_faces, labels)
+        image = Image.open(image_data)
+        image_np = np.array(image)
+        matched_label = match_face(image_np, known_faces, labels)
 
         if matched_label:
             customer_id, customer_name = matched_label.split("_", 1)
