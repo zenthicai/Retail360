@@ -266,6 +266,8 @@ if st.button("📸 Capture & Recognize Face"):
         st.markdown("---")
 
         # 🔍 Data Visuals and Insights
+        df_path = "data/Data_Model.csv"
+        df = pd.read_csv(df_path)
         customer_df = df[df['customer_id'] == int(customer_id)]
         show_customer_insights(customer_df)
 
