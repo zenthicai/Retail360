@@ -266,6 +266,7 @@ if st.button("📸 Capture & Recognize Face"):
         st.markdown("---")
 
         # 🔍 Data Visuals and Insights
+        customer_df = df[df['customer_id'] == int(customer_id)]
         show_customer_insights(customer_df)
 
         offer_text = get_customized_offer_text(customer_df)
