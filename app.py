@@ -119,7 +119,7 @@ if st.button("📸 Capture & Recognize Face"):
 
         if matched_label:
             customer_id, customer_name = matched_label.split("_", 1)
-            df_path = "C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/data/Data_Model.csv"
+            df_path = "data/Data_Model.csv"
             df = pd.read_csv(df_path)
 
             customer_df = df[df['customer_id'] == int(customer_id)]
@@ -178,7 +178,7 @@ if st.button("📸 Capture & Recognize Face"):
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    image_path = f"C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/known_faces/{matched_label}.jpg"
+                    image_path = f"known_faces/{matched_label}.jpg"
 
                     if os.path.exists(image_path):
                         with open(image_path, "rb") as f:
@@ -234,7 +234,7 @@ if st.button("📸 Capture & Recognize Face"):
                 st.markdown(
                     """
                     <div style='background-color: #f8f9fa; padding: 10px 30px; border-radius: 12px; border: 1px solid #ccc; margin-top: 30px;'>
-                    <h3 style='text-align:center; color:#333;'> 🛍️ Purchase Summary & Personalized Experience </h3>
+                    <h3 style='text-align:center; color:#333;'> 🛍️ Purchase Summary </h3>
                     """,
                     unsafe_allow_html=True
                 )
