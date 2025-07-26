@@ -17,7 +17,7 @@ from gtts import gTTS
 
 # Weather API Key
 WEATHER_API_KEY = "your_openweather_api_key"  # Replace with your actual key
-DATA_PATH = "C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/data/Data_Model.csv"
+DATA_PATH = "data/Data_Model.csv"
 
 def get_weather_condition(city):
     try:
@@ -46,7 +46,7 @@ def get_greeting(name, dob):
     is_birthday = dob_obj.strftime("%m-%d") == today_str
 
     # Load city from dataset
-    df = pd.read_csv("C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/data/Data_Model.csv")
+    df = pd.read_csv("data/Data_Model.csv")
     customer_row = df[df['first_name'].str.lower() == name.lower()]
     if not customer_row.empty:
         city = customer_row.iloc[0]['city']
