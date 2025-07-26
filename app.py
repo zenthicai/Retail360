@@ -109,7 +109,7 @@ def render_styled_table(df):
 # Load known faces once
 # Load known faces once
 with st.spinner("🔄 Loading face profiles..."):
-    known_faces, labels = load_known_faces("C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/known_faces")
+    known_faces, labels = load_known_faces("known_faces")
 
 # Button to initiate recognition
 if st.button("📸 Capture & Recognize Face"):
