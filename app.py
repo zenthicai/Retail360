@@ -11,6 +11,7 @@ Original file is located at
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import os
 from gtts import gTTS
 import uuid
