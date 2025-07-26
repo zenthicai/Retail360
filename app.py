@@ -107,7 +107,6 @@ def render_styled_table(df):
     st.markdown(html_table, unsafe_allow_html=True)
 
 # Load known faces once
-# Load known faces once
 with st.spinner("🔄 Loading face profiles..."):
     known_faces, labels = load_known_faces("known_faces")
 
