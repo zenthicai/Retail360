@@ -109,7 +109,7 @@ def render_styled_table(df):
 # Load known faces once
 # Load known faces once
 with st.spinner("🔄 Loading face profiles..."):
-    known_faces, labels = load_known_faces("C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/known_faces")
+    known_faces, labels = load_known_faces("known_faces")
 
 # Button to initiate recognition
 if st.button("📸 Capture & Recognize Face"):
@@ -119,7 +119,7 @@ if st.button("📸 Capture & Recognize Face"):
 
         if matched_label:
             customer_id, customer_name = matched_label.split("_", 1)
-            df_path = "C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/data/Data_Model.csv"
+            df_path = "data/Data_Model.csv"
             df = pd.read_csv(df_path)
 
             customer_df = df[df['customer_id'] == int(customer_id)]
@@ -178,7 +178,7 @@ if st.button("📸 Capture & Recognize Face"):
     col1, col2 = st.columns(2)
 
     with col1:
-        image_path = f"C:/Users/Prasad/Desktop/Zenthic AI/Retail/Retail360/known_faces/{matched_label}.jpg"
+        image_path = f"known_faces/{matched_label}.jpg"
 
         if os.path.exists(image_path):
             with open(image_path, "rb") as f:
@@ -237,7 +237,7 @@ if st.button("📸 Capture & Recognize Face"):
         unsafe_allow_html=True
     )
     st.markdown(" ")
-    #st.subheader("🛍️ Purchase Summary & Personalized Experience")
+    #st.subheader("🛍️ Purchase Summary")
 
     display_cols = {
         "customer_id": "Customer ID",
