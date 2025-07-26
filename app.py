@@ -266,6 +266,9 @@ if st.button("📸 Capture & Recognize Face"):
         st.markdown("---")
 
         # 🔍 Data Visuals and Insights
+        live_face = capture_face_from_webcam()
+        matched_label = match_face(live_face, known_faces, labels)
+        customer_id, customer_name = matched_label.split("_", 1)
         df_path = "data/Data_Model.csv"
         df = pd.read_csv(df_path)
         customer_df = df[df['customer_id'] == int(customer_id)]
