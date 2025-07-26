@@ -56,23 +56,25 @@ def capture_face_from_webcam():
     cap.release()
     return None
 
-def match_face(live_face, known_faces, labels, threshold=2000):
-    """
-    Simple matching using Mean Squared Error (MSE) on grayscale images.
-    """
-    if live_face is None:
-        return None
+def match_face(live_face, known_faces, labels, target_size=(100, 100)):
+    try:
+        # Resize the incoming face to match known face size
+        resized_live_face = cv2.resize(live_face, target_size)
+        
+        # Convert to grayscale if known_faces are grayscale
+        if known_faces[0].ndim == 2:  # (100,100)
+            resized_live_face = cv2.cvtColor(resized_live_face, cv2.COLOR_RGB2GRAY)
 
-    min_mse = float('inf')
-    matched_label = None
+        min_mse = float('inf')
+        matched_label = None
 
-    for i, known_face in enumerate(known_faces):
-        mse = np.mean((live_face - known_face) ** 2)
-        if mse < min_mse:
-            min_mse = mse
-            matched_label = labels[i]
+        for i, known_face in enumerate(known_faces):
+            mse = np.mean((resized_live_face - known_face) ** 2)
+            if mse < min_mse:
+                min_mse = mse
+                matched_label = labels[i]
 
-    if min_mse < threshold:
         return matched_label
-    else:
+    except Exception as e:
+        print(f"Face matching error: {e}")
         return None
