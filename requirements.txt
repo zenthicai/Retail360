@@ -7,6 +7,6 @@ gtts
 requests
 collection
 Pillow
-pyzbar
+#pyzbar
 qrcode
 python-barcode
