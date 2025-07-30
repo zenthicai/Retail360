@@ -18,7 +18,7 @@ from PIL import Image
 import numpy as np
 #import cv2
 #from pyzbar.pyzbar import decode
-from paddleocr import PaddleOCR
+import pytesseract
 from collections import defaultdict
 from datetime import datetime
 import tempfile
