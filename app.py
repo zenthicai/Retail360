@@ -359,22 +359,27 @@ img_file = st.camera_input("Take a picture of the product's barcode")
 
 if img_file is not None:
     st.info("📷 Image captured. Decoding barcode...")
-    image = Image.open(img_file)
-    image_np = np.array(image)
-    barcodes = decode(image_np)
 
-    if barcodes:
-        for barcode in barcodes:
-            barcode_data = barcode.data.decode("utf-8").strip()
-            st.write(f"📦 **Barcode Detected:** {barcode_data}")
-            matched_product = product_df[product_df['barcode'] == barcode_data]
-            if not matched_product.empty:
-                st.session_state.scanned_items[barcode_data] += 1
-                st.success("✅ Product added to cart.")
-            else:
-                st.error("❌ Product not found in catalog.")
+    # Load image into OpenCV format
+    image = Image.open(img_file).convert('RGB')
+    image_np = np.array(image)
+    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+
+    # Use OpenCV's QRCode detector
+    detector = cv2.QRCodeDetector()
+    barcode_data, bbox, _ = detector.detectAndDecode(image_bgr)
+
+    if barcode_data:
+        barcode_data = barcode_data.strip()
+        st.write(f"📦 **Barcode Detected:** {barcode_data}")
+        matched_product = product_df[product_df['barcode'] == barcode_data]
+        if not matched_product.empty:
+            st.session_state.scanned_items[barcode_data] += 1
+            st.success("✅ Product added to cart.")
+        else:
+            st.error("❌ Product not found in catalog.")
     else:
-        st.warning("⚠️ No barcode detected. Please try again.")
+        st.warning("⚠️ No barcode or QR code detected. Please try again.")
 
 st.markdown("---")
 st.markdown(" ")
