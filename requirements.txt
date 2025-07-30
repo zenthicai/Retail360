@@ -8,5 +8,6 @@ requests
 collection
 Pillow
 #pyzbar
+paddleocr
 qrcode
 python-barcode
