@@ -357,31 +357,38 @@ st.markdown("""
     <h3 style='text-align:center; color:#333;'> 📸 Scan Product Barcode </h3>
 """, unsafe_allow_html=True)
 
-img_file = st.camera_input("Take a picture of the product's barcode")
+# Initialize PaddleOCR only once
+ocr = PaddleOCR(use_angle_cls=True, lang='en')  # English OCR
+
+img_file = st.camera_input("📸 Take a picture of the product's barcode label")
 
 if img_file is not None:
-    st.info("📷 Image captured. Decoding barcode...")
+    st.info("📷 Image captured. Running OCR to extract barcode label...")
 
-    # Load image into OpenCV format
+    # Convert image to numpy array
     image = Image.open(img_file).convert('RGB')
     image_np = np.array(image)
-    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-    # Use OpenCV's QRCode detector
-    detector = cv2.QRCodeDetector()
-    barcode_data, bbox, _ = detector.detectAndDecode(image_bgr)
+    # Perform OCR
+    results = ocr.ocr(image_np, cls=True)
 
-    if barcode_data:
-        barcode_data = barcode_data.strip()
-        st.write(f"📦 **Barcode Detected:** {barcode_data}")
-        matched_product = product_df[product_df['barcode'] == barcode_data]
-        if not matched_product.empty:
-            st.session_state.scanned_items[barcode_data] += 1
-            st.success("✅ Product added to cart.")
-        else:
-            st.error("❌ Product not found in catalog.")
+    detected_barcodes = []
+    for line in results[0]:  # results is a nested list
+        text = line[1][0].strip()
+        if text:
+            detected_barcodes.append(text)
+
+    if detected_barcodes:
+        for barcode_data in detected_barcodes:
+            st.write(f"📦 **Detected Label:** `{barcode_data}`")
+            matched_product = product_df[product_df['barcode'] == barcode_data]
+            if not matched_product.empty:
+                st.session_state.scanned_items[barcode_data] += 1
+                st.success("✅ Product added to cart.")
+            else:
+                st.warning("❌ Label detected but not found in product catalog.")
     else:
-        st.warning("⚠️ No barcode or QR code detected. Please try again.")
+        st.warning("⚠️ No readable barcode label detected. Please try again.")
 
 st.markdown("---")
 st.markdown(" ")
