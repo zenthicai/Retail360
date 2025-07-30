@@ -8,6 +8,6 @@ requests
 collection
 Pillow
 #pyzbar
-pytesseract
+easyocr
 qrcode
 python-barcode
