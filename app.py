@@ -357,9 +357,6 @@ st.markdown("""
     <h3 style='text-align:center; color:#333;'> 📸 Scan Product Barcode </h3>
 """, unsafe_allow_html=True)
 
-# Initialize PaddleOCR only once
-ocr = PaddleOCR(use_angle_cls=True, lang='en')  # English OCR
-
 reader = easyocr.Reader(['en'])  # Only initialize once
 
 # Capture image from webcam
