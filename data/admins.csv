@@ -1,0 +1,2 @@
+admin_id,username,password_hash,role,created_at
+1,admin,hashed_password_placeholder,manager,2025-07-29 05:14:28

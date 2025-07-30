@@ -1,0 +1,2 @@
+pass_id,invoice_id,barcode_data,issued_at,used_at,status
+1,1,EXIT123456,2025-07-29 05:14:28,,active

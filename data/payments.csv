@@ -1,0 +1,2 @@
+payment_id,invoice_id,payment_gateway,transaction_ref,amount_paid,status,paid_at
+1,1,Razorpay,TXN123456,495.0,success,2025-07-29 05:14:28

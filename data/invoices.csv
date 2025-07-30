@@ -1,0 +1,2 @@
+invoice_id,customer_id,total_amount,discount_applied,tax_amount,final_amount,payment_status,created_at
+1,,500,50,45,495,paid,7/29/2025 5:14
