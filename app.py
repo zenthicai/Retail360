@@ -293,3 +293,226 @@ if image_data is not None:
 
     #else:
       #st.error("❌ Face not recognized. Please register at the helpdesk.")
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+st.markdown(" ")
+st.markdown(" ")
+st.markdown(" ")
+st.markdown("---")
+st.markdown(" ")
+st.markdown(" ")
+
+st.markdown("""
+    <style>
+    .title-box1 {
+        background-color: #FFFDD0;
+        padding: 30px;
+        border: 2px solid #6c757d;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 34px;
+        font-weight: bold;
+        color: #000000;
+        margin-bottom: 20px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    .stRadio > div {
+        flex-direction: row !important;
+    }
+    </style>
+    <div class="title-box1">
+        AI-Enabled Self-Checkout System 
+    </div>
+""", unsafe_allow_html=True)
+
+st.markdown("<hr style='border: 1px solid #ddd;'>", unsafe_allow_html=True)
+
+data_file = st.file_uploader("📂 Upload product catalog CSV (data_model.csv)", type=["csv"])
+if not data_file:
+    st.warning("Please upload a product catalog CSV file to proceed.")
+    st.stop()
+
+product_df = pd.read_csv(data_file)
+st.success("✅ Product catalog loaded successfully.")
+product_df['barcode'] = product_df['barcode'].astype(str).str.strip()
+
+if "scanned_items" not in st.session_state:
+    st.session_state.scanned_items = defaultdict(int)
+if "invoice_ready" not in st.session_state:
+    st.session_state.invoice_ready = False
+
+st.markdown("""
+    <div style='background-color: #f8f9fa; padding: 10px 30px; border-radius: 12px; border: 1px solid #ccc; margin-top: 30px;'>
+    <h3 style='text-align:center; color:#333;'> 📸 Scan Product Barcode </h3>
+""", unsafe_allow_html=True)
+
+img_file = st.camera_input("Take a picture of the product's barcode")
+
+if img_file is not None:
+    st.info("📷 Image captured. Decoding barcode...")
+    image = Image.open(img_file)
+    image_np = np.array(image)
+    barcodes = decode(image_np)
+
+    if barcodes:
+        for barcode in barcodes:
+            barcode_data = barcode.data.decode("utf-8").strip()
+            st.write(f"📦 **Barcode Detected:** {barcode_data}")
+            matched_product = product_df[product_df['barcode'] == barcode_data]
+            if not matched_product.empty:
+                st.session_state.scanned_items[barcode_data] += 1
+                st.success("✅ Product added to cart.")
+            else:
+                st.error("❌ Product not found in catalog.")
+    else:
+        st.warning("⚠️ No barcode detected. Please try again.")
+
+st.markdown("---")
+st.markdown(" ")
+
+st.session_state.invoice_ready = True
+
+def render_invoice_custom_template(invoice_items, total):
+    st.markdown("""
+        <div style='background-color: #f8f9fa; padding: 10px 30px; border-radius: 12px; border: 1px solid #ccc; margin-top: 30px;'>
+        <h3 style='text-align:center; color:#333;'> 🧾 Invoice Summary </h3>
+    """, unsafe_allow_html=True)
+
+    st.markdown(" ")
+    st.markdown(" ")
+    st.markdown(" ")
+
+    st.markdown("""
+        <div style='padding:10px; border:2px solid #ddd; border-radius:10px; background-color:#FFFDD0;'>
+            <h2 style='text-align:center;'>🛍️ Zenthic AI Retail360 Invoice</h2>
+            <p style='text-align:center;'>Date: {date} | Invoice #: {inv}</p>
+        </div>
+    """.format(
+        date=datetime.now().strftime("%d-%m-%Y %H:%M"),
+        inv=f"INV{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    ), unsafe_allow_html=True)
+
+    df = pd.DataFrame(invoice_items)
+    df['Total'] = df['Unit Price'] * df['Quantity']
+    df_display = df[['Product ID', 'Product Name', 'Brand', 'Quantity', 'Unit Price', 'Total']]
+    df_display.columns = ['Product ID', 'Product Name', 'Brand', 'Qty', 'Price ($)', 'Total ($)']
+    render_styled_table(df_display)
+
+    subtotal = df['Total'].sum()
+    tax = round(subtotal * 0.05, 2)
+    total = round(subtotal + tax, 2)
+
+    st.markdown(" ")
+    st.markdown(" ")
+
+    col1, col2, col3, col4 = st.columns([1, 2, 3, 4])  # Wider right column for text
+
+    with col1:
+        upi_id = "durgaprasad611983@oksbi"
+        payee_name = "Durga Prasad"
+        amount_inr = total * 85
+        upi_url = f"upi://pay?pa={upi_id}&pn={payee_name}&am={amount_inr:.2f}&cu=INR"
+
+        qr = qrcode.make(upi_url)
+        buf = BytesIO()
+        qr.save(buf, format="PNG")
+        buf.seek(0)
+
+        st.image(buf, caption=f"Scan & Pay ₹{amount_inr:.2f}")
+
+    with col2:
+        st.markdown(f"""
+        <div style='font-size:17px; padding:10px;'>
+            <ul>
+                <li>Open any UPI-enabled app (PhonePe, GPay, Paytm, etc.).</li>
+                <li>Scan the QR code on the left </li>
+                <li>Verify Payee: <strong>{payee_name} </strong></li>
+                <li>Confirm Amount: ₹{amount_inr:.2f} </li>
+                <li>Complete the payment securely. </li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col4:
+        upi_id = "durgaprasad611983@oksbi"
+        payee_name = "Durga Prasad"
+        amount_inr = total * 85
+        upi_url = f"upi://pay?pa={upi_id}&pn={payee_name}&am={amount_inr:.2f}&cu=INR"
+        st.markdown(f"""
+        <div style='font-size:17px; padding:10px;'>
+            <p><strong>Subtotal:</strong> ${subtotal:.2f}</p>
+            <p><strong>Tax (5%):</strong> ${tax:.2f}</p>
+            <p><strong>Total Amount (INR):</strong> ₹{amount_inr:.2f}</p>
+            <hr style='margin: 10px 0;'>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    return total
+
+if st.session_state.invoice_ready and st.session_state.scanned_items:
+    invoice_items = []
+    for barcode, qty in st.session_state.scanned_items.items():
+        product_row = product_df[product_df['barcode'] == barcode]
+        if not product_row.empty:
+            product = product_row.iloc[0]
+            product_id = product.get('product_id')
+            name = product.get('name') or product.get('product_name') or 'Unknown'
+            brand = product.get('brand')
+            unit_price = float(product.get('unit_price', 0))
+            invoice_items.append({
+                'Product ID': product_id,
+                'Product Name': name,
+                'Brand': brand,
+                'Barcode': barcode,
+                'Quantity': qty,
+                'Unit Price': unit_price
+            })
+    total = render_invoice_custom_template(invoice_items, 0)
+else:
+    st.warning("No items scanned yet or invoice not generated.")
+
+st.markdown("---")
+st.markdown(" ")
+
+utr = st.text_input("Enter UPI Transaction Reference ID (UTR):")
+st.markdown(" ")
+confirm = st.button("Confirm Payment")
+st.markdown(" ")
+
+if confirm and utr.strip():
+    import barcode
+    from barcode.writer import ImageWriter
+
+    st.success("✅ Payment Confirmed!")
+
+    exit_code = f"EXIT-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    Code128 = barcode.get_barcode_class('code128')
+    barcode_instance = Code128(exit_code, writer=ImageWriter())
+
+    buffer_exit = BytesIO()
+    barcode_instance.write(buffer_exit)  # ← Correct usage
+    buffer_exit.seek(0)
+
+    st.markdown(
+        """
+        <div style='background-color: #f8f9fa; padding: 10px 30px; border-radius: 12px; border: 1px solid #ccc; margin-top: 30px;'>
+        <h3 style='text-align:center; color:#333;'> 🔐 Secure Exit Barcode </h3>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(" ")
+    #st.subheader("🔐 Secure Exit Barcode")
+    st.markdown(" ")
+    st.markdown(" ")
+
+    col1, col2 = st.columns([1, 2])  # Wider right column for text
+
+    with col2:
+
+    	st.image(buffer_exit, caption=f"🔓 Scan at Exit: {exit_code}")
+
+else:
+    st.warning("⚠️ Please complete payment and enter UTR to generate exit barcode.")
+
+st.markdown("---")
