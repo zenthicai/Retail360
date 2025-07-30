@@ -6,3 +6,6 @@ plotly
 gtts
 requests
 Pillow
+pyzbar
+qrcode
+python-barcode
