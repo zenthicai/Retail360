@@ -18,7 +18,7 @@ from PIL import Image
 import numpy as np
 #import cv2
 #from pyzbar.pyzbar import decode
-import pytesseract
+import easyocr
 from collections import defaultdict
 from datetime import datetime
 import tempfile
@@ -360,35 +360,32 @@ st.markdown("""
 # Initialize PaddleOCR only once
 ocr = PaddleOCR(use_angle_cls=True, lang='en')  # English OCR
 
-img_file = st.camera_input("📸 Take a picture of the product's barcode label")
+reader = easyocr.Reader(['en'])  # Only initialize once
 
-if img_file is not None:
-    st.info("📷 Image captured. Running OCR to extract barcode label...")
+# Capture image from webcam
+img_file_buffer = st.camera_input("Scan a Barcode")
 
-    # Convert image to numpy array
-    image = Image.open(img_file).convert('RGB')
+if img_file_buffer is not None:
+    # Convert image buffer to OpenCV format
+    image = Image.open(img_file_buffer)
     image_np = np.array(image)
+    image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-    # Perform OCR
-    results = ocr.ocr(image_np, cls=True)
+    st.image(image_np, caption="Captured Image", use_column_width=True)
 
-    detected_barcodes = []
-    for line in results[0]:  # results is a nested list
-        text = line[1][0].strip()
-        if text:
-            detected_barcodes.append(text)
+    # Run EasyOCR on the image
+    with st.spinner("🔍 Scanning for barcode..."):
+        results = reader.readtext(image_np)
 
-    if detected_barcodes:
-        for barcode_data in detected_barcodes:
-            st.write(f"📦 **Detected Label:** `{barcode_data}`")
-            matched_product = product_df[product_df['barcode'] == barcode_data]
-            if not matched_product.empty:
-                st.session_state.scanned_items[barcode_data] += 1
-                st.success("✅ Product added to cart.")
-            else:
-                st.warning("❌ Label detected but not found in product catalog.")
-    else:
-        st.warning("⚠️ No readable barcode label detected. Please try again.")
+        found_barcode = False
+        for (bbox, text, prob) in results:
+            if len(text) >= 6 and text.isalnum():  # basic check
+                st.success(f"📦 Detected Barcode: `{text}` with {prob:.2f} confidence")
+                found_barcode = True
+                break
+
+        if not found_barcode:
+            st.warning("⚠️ No barcode-like text found. Try with a clearer image.")
 
 st.markdown("---")
 st.markdown(" ")
