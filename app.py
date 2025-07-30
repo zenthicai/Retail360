@@ -16,7 +16,7 @@ from gtts import gTTS
 import uuid
 from PIL import Image
 import numpy as np
-import cv2
+#import cv2
 #from pyzbar.pyzbar import decode
 from paddleocr import PaddleOCR
 from collections import defaultdict
