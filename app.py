@@ -16,7 +16,7 @@ from gtts import gTTS
 import uuid
 from PIL import Image
 import numpy as np
-from pyzbar.pyzbar import decode
+#from pyzbar.pyzbar import decode
 from collections import defaultdict
 from datetime import datetime
 import tempfile
