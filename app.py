@@ -11,12 +11,20 @@ Original file is located at
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import os
 from gtts import gTTS
 import uuid
-import base64
 from PIL import Image
+import numpy as np
+from pyzbar.pyzbar import decode
+from collections import defaultdict
+from datetime import datetime
+import tempfile
+import qrcode
+from io import BytesIO
+import base64
+import barcode
+from barcode.writer import ImageWriter
 from face_utils import load_known_faces, capture_face_from_webcam, match_face
 from greet_utils import get_greeting
 from offer_utils import get_customized_offer_text
